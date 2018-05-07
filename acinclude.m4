@@ -677,9 +677,10 @@ int main (int, char **)
     return t;
 }
     ])],
-    [AC_MSG_RESULT(yes) ; GCC_ATOMIC_BUILTINS_SUPPORTED=1 libzmq_cv_has_atomic_instrisics="yes" ; $1])
+    [libzmq_cv_has_atomic_instrisics="yes"],
+    [libzmq_cv_has_atomic_instrisics="no"])
 
-    if test "x$GCC_ATOMIC_BUILTINS_SUPPORTED" != x1; then
+    if test "x$libzmq_cv_has_atomic_instrisics" = "xno"; then
         save_LDFLAGS=$LDFLAGS
         LDFLAGS="$LDFLAGS -latomic"
         AC_LINK_IFELSE([AC_LANG_SOURCE([
@@ -691,9 +692,17 @@ int main (int, char **)
             return t;
         }
         ])],
-        [AC_MSG_RESULT(yes) ; libzmq_cv_has_atomic_instrisics="yes" LIBS="-latomic" ; $1],
-        [AC_MSG_RESULT(no) ; libzmq_cv_has_atomic_instrisics="no"; $2])
+        [libzmq_cv_has_atomic_instrisics="yes" LIBS="-latomic"],
+        [libzmq_cv_has_atomic_instrisics="no"])
         LDFLAGS=$save_LDFLAGS
+    fi
+
+    if test "x$libzmq_cv_has_atomic_instrisics" = "xyes"; then
+        AC_MSG_RESULT(yes)
+        $1
+    else
+        AC_MSG_RESULT(no)
+        $2
     fi
 }])
 
